@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #game-container {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+            width: 270px;
+        }
+
+        .tile {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ccc;
+            text-transform: uppercase;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            line-height: 50px;
+            background-color: white;
+        }
+
+        .tile.correct {
+            background-color: #6aaa64; /* Green */
+            color: white;
+            border-color: #6aaa64;
+        }
+
+        .tile.present {
+            background-color: #c9b458; /* Yellow */
+            color: white;
+            border-color: #c9b458;
+        }
+
+        .tile.absent {
+            background-color: #787c7e; /* Gray */
+            color: white;
+            border-color: #787c7e;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        #play-again {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            width: 200px; /* Optional: set a fixed width for the button */
+            margin-left: auto;
+            margin-right: auto; /* Centers the button horizontally */
+        }
+
+        #play-again:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+        <a href="NBAhomepage.html" id="top">Home</a> |
+        <a href="Resume.html">Resume</a> |
+        <a href="#">AI Integration</a>
+    <h1>Wordle Game</h1>
+    <div id="game-container"></div>
+    <div>
+        <input type="text" id="guess-input" maxlength="5" placeholder="Enter your guess">
+        <button id="guess-button">Submit</button>
+    </div>
+    <div id="message"></div>
+    <button id="play-again">Play Again</button>
+
+    <script>
+// Array of 100 possible 5-letter words
+const wordList = [
+    "apple", "abuse", "beach", "grape", "lemon", "peach", "plumb", "mango", "melon", "berry",
+    "peppy", "jolly", "happy", "shady", "bumpy", "storm", "cloud", "bliss", "dream", "peace",
+    "fruit", "shoes", "table", "chair", "lunar", "plaza", "dance", "flame", "track", "quick",
+    "laser", "brick", "water", "earth", "firey", "stone", "beach", "south", "north", "apple",
+    "bored", "piano", "music", "light", "plant", "think", "silly", "cloud", "gloom", "grind",
+    "vigor", "chill", "noble", "smart", "shiny", "flare", "plush", "cling", "crisp", "silly",
+    "grape", "rally", "shine", "sleep", "creek", "ditch", "flock", "jumpy", "lunar", "happy",
+    "peace", "metal", "weary", "storm", "chime", "black", "knock", "penny", "score", "plane",
+    "grind", "hilly", "sweep", "swirl", "froze", "worry", "slate", "dashy", "socks", "unzip",
+    "prowl", "brisk", "chase", "drift", "grown", "smash", "creek", "roars", "spins", "ships",
+    "small", "picks", "vibes", "vital", "basis", "quick", "glory", "pride", "sugar", "suite",
+    "roman", "risky", "fluff", "juice", "focus", "guess", "virus", "globe", "staff", "bless",
+    "smile", "serve", "shout", "straw", "visit", "learn", "skirt", "bread", "money", "brief",
+    "beads", "stall", "sweat", "blame", "deatn", "puddle", "grits", "swift", "batch", "candy",
+    "sweet", "world", "brick", "chime", "grasp", "shape", "spare", "count"
+];
+
+// Function to reset the game
+function resetGame() {
+    // Randomly pick a target word from the wordList
+    targetWord = wordList[Math.floor(Math.random() * wordList.length)];
+    currentRow = 0;
+    
+    // Clear the game container
+    const tiles = document.querySelectorAll(".tile");
+    tiles.forEach(tile => tile.textContent = "");
+    tiles.forEach(tile => tile.classList.remove("correct", "present", "absent"));
+
+    // Reset the message and input field
+    message.textContent = "";
+    guessInput.value = "";
+    guessInput.disabled = false;
+    playAgainButton.style.display = "none";
+}
+
+// Create the game board (6 rows, 5 columns)
+const gameContainer = document.getElementById("game-container");
+for (let i = 0; i < 30; i++) {
+    const tile = document.createElement("div");
+    tile.classList.add("tile");
+    gameContainer.appendChild(tile);
+}
+
+let targetWord = wordList[Math.floor(Math.random() * wordList.length)];
+let currentRow = 0;
+
+// Add event listeners for the input and button
+const guessInput = document.getElementById("guess-input");
+const guessButton = document.getElementById("guess-button");
+const message = document.getElementById("message");
+const playAgainButton = document.getElementById("play-again");
+
+guessButton.addEventListener("click", () => {
+    const guess = guessInput.value.toLowerCase();
+    if (guess.length !== 5) {
+        message.textContent = "Guess must be 5 letters!";
+        return;
+    }
+    checkGuess(guess);
+    guessInput.value = "";
+});
+
+playAgainButton.addEventListener("click", resetGame);
+
+// Updated checkGuess function with correct color feedback logic
+function checkGuess(guess) {
+    if (currentRow >= 6) {
+        message.textContent = "Game over! You've used all attempts.";
+        guessInput.disabled = true;
+        playAgainButton.style.display = "block";
+        return;
+    }
+
+    const tiles = document.querySelectorAll(".tile");
+    const startIndex = currentRow * 5;
+
+    // Create an array to track feedback
+    let feedback = new Array(guess.length).fill("absent");  // Default all to "absent"
+    
+    // Create a copy of the target to track used letters
+    let targetCopy = targetWord.split('');
+    
+    // First, check for correct letters (green) by comparing each letter in the guess
+    for (let i = 0; i < guess.length; i++) {
+        const tile = tiles[startIndex + i];
+        const letter = guess[i];
+        tile.textContent = letter;
+
+        if (letter === targetWord[i]) {
+            feedback[i] = "correct";  // Mark as green
+            targetCopy[i] = null;  // Remove this letter from the target copy (prevent reusing)
+        }
+    }
+    
+    // Second, check for correct letters in the wrong position (yellow)
+    for (let i = 0; i < guess.length; i++) {
+        if (feedback[i] !== "correct" && targetCopy.includes(guess[i])) {
+            feedback[i] = "present";  // Mark as yellow
+            targetCopy[targetCopy.indexOf(guess[i])] = null;  // Remove this letter from the target copy
+        }
+    }
+
+    // Apply feedback classes to the tiles
+    for (let i = 0; i < feedback.length; i++) {
+        const tile = tiles[startIndex + i];
+        tile.classList.remove("correct", "present", "absent"); // Remove previous feedback classes
+        tile.classList.add(feedback[i]); // Add new feedback classes
+    }
+    
+    currentRow++;
+
+    if (guess === targetWord) {
+        message.textContent = "Congratulations! You guessed the word!";
+        guessInput.disabled = true;
+        playAgainButton.style.display = "block";
+    } else if (currentRow === 6) {
+        message.textContent = `Game over! The word was "${targetWord}".`;
+        guessInput.disabled = true;
+        playAgainButton.style.display = "block";
+    }
+}
+
+    </script>
+</body>
+</html>

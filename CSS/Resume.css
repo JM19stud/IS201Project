@@ -1,0 +1,102 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+nav {
+    background-color: #0073e6;
+    padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1.1em;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    display: grid;
+    grid-template-areas: 
+        "header header header"
+        "contact experience education"
+        "skills skills skills";
+    grid-template-columns: 1fr 2fr 1fr; 
+    grid-template-rows: auto 1fr auto; 
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.header {
+    grid-area: header;
+    text-align: center;
+    background: #0073e6;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.header p {
+    margin: 5px 0;
+}
+
+.contact {
+    grid-area: contact;
+    background: #e6f7ff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.experience {
+    grid-area: experience;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.education {
+    grid-area: education;
+    background: #e6f7ff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.skills {
+    grid-area: skills;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Responsive Design from AI */
+@media (max-width: 768px) {
+    .container {
+        grid-template-areas: 
+            "header"
+            "experience"
+            "contact"
+            "education"
+            "skills";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+}
